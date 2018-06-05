@@ -13,6 +13,121 @@ using System.Net;
 
 namespace hpl.Controllers
 {
+    //出力処理
+    //public ActionResult Export(userModel model)
+    //{
+    //    string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
+    //    try
+    //    {
+    //        var userList = new List<string>();
+    //        string sqlWhere = "";
+
+    //        if (Session["serch1"] != null)
+    //        {
+    //            sqlWhere = "where " + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%'";
+    //        }
+
+    //        using (MySqlConnection conn = new MySqlConnection(hp))
+    //        {
+    //            conn.Open();
+    //            using (MySqlCommand cmd = conn.CreateCommand())
+    //            {
+    //                cmd.CommandText = $"select * from userdata {sqlWhere} ORDER BY id ASC;";
+
+    //                using (MySqlDataReader reader = cmd.ExecuteReader())
+    //                {
+    //                    while (reader.Read())
+    //                    {
+    //                        userList.Add(reader["id"].ToString() + "," + reader["name"].ToString() + "," + reader["password"].ToString() + "," + reader["email"].ToString() + "," + reader["remark"].ToString());
+    //                    }
+    //                }
+    //            }
+    //        }
+
+    //        byte[] csv;
+    //        using (System.IO.MemoryStream ms = new MemoryStream())
+    //        using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
+    //        {
+    //            foreach (string row in userList)
+    //            {
+    //                sw.WriteLine(row);
+    //            }
+    //            sw.Flush();
+    //            csv = ms.ToArray();
+    //        }
+    //        return File(csv, "text/csv", "userdata.csv");
+
+
+    //    }
+    //    catch (System.Exception er)
+    //    {
+    //        byte[] error;
+    //        using (System.IO.MemoryStream ms = new MemoryStream())
+    //        using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
+    //        {
+    //            string raw = er.ToString();
+    //            sw.WriteLine(raw);
+
+    //            sw.Flush();
+    //            error = ms.ToArray();
+    //        }
+    //        return File(error, "text", "error.txt");
+    //    }
+    //}
+
+    //[HttpPost]
+    //public ActionResult Import(userModel model)
+    //{
+    //    if (Request.Files.Count == 0)
+    //    {
+    //        ViewBag.error = "エラーです";
+    //    }
+    //    var file = Request.Files[0];
+
+    //    file.SaveAs("C:\\Users\\y-tamitsu\\Desktop");
+
+    //    Session["path"] = "C:\\Users\\y - tamitsu\\Desktop";
+    //    string con = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
+    //    MySqlConnection hped = new MySqlConnection(con);
+    //    hped.Open();
+    //    try
+    //    {
+    //        string exstr = @"load data local infile " + Session["path"] + " into table userdata fields terminated by ',';";
+    //        MySqlCommand exit = new MySqlCommand(exstr, hped);
+    //        MySqlParameter ex = new MySqlParameter("@id", MySqlDbType.Int64);
+    //        ex.Direction = ParameterDirection.Input;
+    //        ex.Value = model.id;
+    //        exit.Parameters.Add(ex);
+    //        exit.ExecuteNonQuery();
+    //        hped.Close();
+    //        return RedirectToAction("List");
+    //    }
+
+    //    catch (System.Exception er)
+    //    {
+    //        byte[] error;
+    //        using (System.IO.MemoryStream ms = new MemoryStream())
+    //        using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
+    //        {
+    //            string raw = er.ToString();
+    //            sw.WriteLine(raw);
+
+    //            sw.Flush();
+    //            error = ms.ToArray();
+    //        }
+    //        return File(error, "text", "error.txt");
+    //    }
+    //    finally
+    //    {
+    //        hped.Close();
+    //    }
+    //}
+
+    //public ActionResult Error()
+    //{
+    //    ViewBag.ce = Session["error"];
+    //    return View();
+    //}
     public class HomeController : Controller
     {
         public ActionResult Index()
@@ -33,13 +148,13 @@ namespace hpl.Controllers
         }
 
         //ログイン
-        public ActionResult Login()
+        public ActionResult AcLogin()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult Login(userModel model, int id, string password)
+        public ActionResult AcLogin(userModel model, int id, string password)
         {
             try
             {
@@ -50,13 +165,13 @@ namespace hpl.Controllers
                     conn.Open();
                     using (MySqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = $"SELECT* FROM userdata where id = " + id + " and password = '" + password + "' ORDER BY id ASC;";
+                        cmd.CommandText = $"SELECT* FROM acuser where id = " + id + " and password = '" + password + "' ORDER BY id ASC;";
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read() == true)
                             {
                                 // ユーザー認証 成功
-                                return Redirect("List");
+                                return Redirect("AcList");
                             }
                             else
                             {   //ユーザー認証 失敗
@@ -95,121 +210,7 @@ namespace hpl.Controllers
             return View();
         }
 
-        //出力処理
-        public ActionResult Export(userModel model)
-        {
-            string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-            try
-            {
-                var userList = new List<string>();
-                string sqlWhere = "";
 
-                if (Session["serch1"] != null)
-                {
-                    sqlWhere = "where " + Session["example1"] + " like '%" + Session["serch1"] + "%'" + Session["select"] + " " + Session["example2"] + " like '%" + Session["serch2"] + "%'";
-                }
-
-                using (MySqlConnection conn = new MySqlConnection(hp))
-                {
-                    conn.Open();
-                    using (MySqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = $"select * from userdata {sqlWhere} ORDER BY id ASC;";
-
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                userList.Add(reader["id"].ToString() + "," + reader["name"].ToString() + "," + reader["password"].ToString() + "," + reader["email"].ToString() + "," + reader["remark"].ToString());
-                            }
-                        }
-                    }
-                }
-
-                byte[] csv;
-                using (System.IO.MemoryStream ms = new MemoryStream())
-                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
-                {
-                    foreach (string row in userList)
-                    {
-                        sw.WriteLine(row);
-                    }
-                    sw.Flush();
-                    csv = ms.ToArray();
-                }
-                return File(csv, "text/csv", "userdata.csv");
-
-
-            }
-            catch (System.Exception er)
-            {
-                byte[] error;
-                using (System.IO.MemoryStream ms = new MemoryStream())
-                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
-                {
-                    string raw = er.ToString();
-                    sw.WriteLine(raw);
-
-                    sw.Flush();
-                    error = ms.ToArray();
-                }
-                return File(error, "text", "error.txt");
-            }
-        }
-
-        [HttpPost]
-        public ActionResult Import(userModel model)
-        {
-            if (Request.Files.Count == 0)
-            {
-                ViewBag.error = "エラーです";
-            }
-            var file = Request.Files[0];
-
-            file.SaveAs("C:\\Users\\y-tamitsu\\Desktop");
-
-            Session["path"] = "C:\\Users\\y - tamitsu\\Desktop";
-            string con = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-            MySqlConnection hped = new MySqlConnection(con);
-            hped.Open();
-            try
-            {
-                string exstr = @"load data local infile " + Session["path"] + " into table userdata fields terminated by ',';";
-                MySqlCommand exit = new MySqlCommand(exstr, hped);
-                MySqlParameter ex = new MySqlParameter("@id", MySqlDbType.Int64);
-                ex.Direction = ParameterDirection.Input;
-                ex.Value = model.id;
-                exit.Parameters.Add(ex);
-                exit.ExecuteNonQuery();
-                hped.Close();
-                return RedirectToAction("List");
-            }
-
-            catch (System.Exception er)
-            {
-                byte[] error;
-                using (System.IO.MemoryStream ms = new MemoryStream())
-                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
-                {
-                    string raw = er.ToString();
-                    sw.WriteLine(raw);
-
-                    sw.Flush();
-                    error = ms.ToArray();
-                }
-                return File(error, "text", "error.txt");
-            }
-            finally
-            {
-                hped.Close();
-            }
-        }
-
-        public ActionResult Error()
-        {
-            ViewBag.ce = Session["error"];
-            return View();
-        }
 
         //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //　ここからオークション
@@ -521,8 +522,8 @@ namespace hpl.Controllers
                         }
                         if (sort == "time")
                         {
-                            if (acde == "asc") AcList.Sort((a, b) => a.time.CompareTo(b.time));
-                            else AcList.Sort((a, b) => b.time.CompareTo(a.time));
+                            if (acde == "asc") AcList.Sort((a, b) => a.lasttime.CompareTo(b.lasttime));
+                            else AcList.Sort((a, b) => b.lasttime.CompareTo(a.lasttime));
                             return View(AcList);
                         }
                         else if (sort == "day")
@@ -644,6 +645,7 @@ namespace hpl.Controllers
             try
             {
                 ViewBag.id = id;
+                ViewBag.time = time;
                 ViewBag.lasttime = lasttime;
                 return View(GetAc(id));
             }
