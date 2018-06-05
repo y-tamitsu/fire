@@ -147,55 +147,7 @@ namespace hpl.Controllers
             return View();
         }
 
-        //ログイン
-        public ActionResult AcLogin()
-        {
-            return View();
-        }
 
-        [HttpPost]
-        public ActionResult AcLogin(userModel model, int id, string password)
-        {
-            try
-            {
-                string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
-
-                using (MySqlConnection conn = new MySqlConnection(hp))
-                {
-                    conn.Open();
-                    using (MySqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = $"SELECT* FROM acuser where id = " + id + " and password = '" + password + "' ORDER BY id ASC;";
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read() == true)
-                            {
-                                // ユーザー認証 成功
-                                return Redirect("AcList");
-                            }
-                            else
-                            {   //ユーザー認証 失敗
-                                ModelState.AddModelError(string.Empty, "指定されたユーザー名またはパスワードが正しくありません。");
-                                return View();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (System.Exception er)
-            {
-                byte[] error;
-                using (System.IO.MemoryStream ms = new MemoryStream())
-                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
-                {
-                    string raw = er.Message;
-                    sw.WriteLine(raw);
-                    sw.Flush();
-                    error = ms.ToArray();
-                }
-                return File(error, "text", "error.txt");
-            }
-        }
 
         public ActionResult Logout()
         {
@@ -260,7 +212,59 @@ namespace hpl.Controllers
             }
         }
 
+        //ログイン
+        public ActionResult AcLogin()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        public ActionResult AcLogin(userModel model, int id, string password)
+        {
+            try
+            {
+                string hp = ConfigurationManager.ConnectionStrings["Hp"].ConnectionString;
+
+                using (MySqlConnection conn = new MySqlConnection(hp))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = $"SELECT* FROM acuser where id = " + id + " and password = '" + password + "' ORDER BY id ASC;";
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read() == true)
+                            {
+                                // ユーザー認証 成功
+                                Session["loginid"] = model.id;
+                                Session["username"] = model.name;
+                                return Redirect("AcList");
+                            }
+                            else
+                            {   //ユーザー認証 失敗
+                                ModelState.AddModelError(string.Empty, "指定されたユーザー名またはパスワードが正しくありません。");
+                                return View();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (System.Exception er)
+            {
+                byte[] error;
+                using (System.IO.MemoryStream ms = new MemoryStream())
+                using (System.IO.StreamWriter sw = new StreamWriter(ms, System.Text.Encoding.GetEncoding("utf-8")))
+                {
+                    string raw = er.Message;
+                    sw.WriteLine(raw);
+                    sw.Flush();
+                    error = ms.ToArray();
+                }
+                return File(error, "text", "error.txt");
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //出品情報　登録
         public ActionResult ExhibitReg()
         {
@@ -332,8 +336,6 @@ namespace hpl.Controllers
                 return File(error, "text", "error.txt");
             }
         }
-
-
 
         //出品情報　リスト
         public ActionResult AcList(userModel model)
